@@ -2,6 +2,8 @@
 
 namespace Varspool\WebsocketBundle\Multiplex;
 
+use Varspool\WebsocketBundle\Application\MultiplexApplication;
+
 use WebSocket\Connection;
 
 use Varspool\WebsocketBundle\Multiplex\Protocol;
@@ -34,7 +36,7 @@ class Channel
      *
      * @param string $topic
      */
-    public function __construct($topic)
+    public function __construct($topic, MultiplexApplication $application)
     {
         $this->topic = $topic;
     }
@@ -77,7 +79,7 @@ class Channel
      *
      * @param Subscription $client
      */
-    public function subscribeClient($client)
+    public function subscribeClient(Connection $client)
     {
         $this->clients[] = $client;
     }
@@ -87,13 +89,18 @@ class Channel
      *
      * @param Connection $client Websocket connection
      */
-    public function unsubscribeClient($client)
+    public function unsubscribeClient(Connection $client)
     {
         $index = array_search($client, $this->clients);
         if ($index) {
             unset($this->clients[$index]);
         }
     }
+
+    public function isClientSubscribed(Connection $client)
+    {
+
+    }WW
 
     /**
      * Sends a message through the channel
@@ -139,8 +146,12 @@ class Channel
      * @param string $message
      * @return array
      */
-    public function receive($message, Connection $client = null)
+    public function receive($message, Connection $client)
     {
+        if (!$this->isClientSubscribed($client)) {
+            $this->subscribeClient($client);
+        }
+
         $collected = array();
         foreach ($this->subscriptions as $subscription) {
             $collected[] = $subscription->onMessage($this, $message, $client);

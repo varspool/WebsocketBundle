@@ -16,11 +16,20 @@ use WebSocket\Connection;
 interface Subscription
 {
     /**
-     * When messages are received on any of the topics this subscription has
-     * been subscribed to, this method will be called with the message data.
+     * @param Channel $channel   The channel is an object that holds all the active
+     *          client connections to a given topic, and all the server-side
+     *          subscribers. You can ->send($message) to the channel to broadcast
+     *          it to all the subscribed client connections. ->getTopic() identifies
+     *          the topic the message was received on.
      *
-     * @param Channel $channel
-     * @param string $message
+     * @param string $message    The received message, as a string
+     *
+     * @param Connection $client The client connection the message was received
+     *          from. You can ->send() to the client, but it is a raw Websocket
+     *          connection, so if you want to send a multiplexed message to a single
+     *          client, you'll probably use
+     *          `Varspool\WebsocketBundle\Multiplex\Protocol::toString($type, $topic, $payload)`
+     *          and the Protocol::TYPE_MESSAGE constant.
      */
     public function onMessage(Channel $channel, $message, Connection $client = null);
 }

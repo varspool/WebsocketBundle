@@ -1,7 +1,9 @@
 <!-- vim: set ft=markdown tw=79 sw=4 ts=4 et : -->
 # VarspoolWebsocketBundle
 
-Provides websocket services, including an in-built server.
+Alpha stability. Provides websocket services, including an in-built server, 
+multiplexing, semantic configuration.
+
 ## Installation
 
 VarspoolWebsocketBundle depends on:
@@ -82,7 +84,7 @@ Arguments:
 ```
 
 This command can be used to start a websocket server. Servers are defined in 
-your configuration, and you'll have to at least define one to get started:
+your configuration, and you **must** define at least one to get started:
 
 ```yaml
 varspool_websocket:
@@ -136,95 +138,101 @@ As for Javascript libraries, they're mostly up to you. But unless you're
 already using Coffeescript, you might find the ones shipped along with 
 php-websocket a pain to install.
 
+### Multiplexing
 
+One thing I would recommend is multiplexing your javascript components'
+connections. The SockJS way of doing that is [pretty
+elegant](http://www.rabbitmq.com/blog/2012/02/23/how-to-compose-apps-using-websockets/),
+and is supported by an application shipped along with this bundle.
 
-/////////// UP TO HERE
-<!--
+The default configuration for this bundle (in
+Varspool/WebsocketBundle/Resources/config/services.xml) defines a server-side multiplex
+application, served at `ws://{host}:{port}/multiplex`. This application
+implements the multiplex protocol that the [SockJS websocket-multiplex front-end
+library](https://github.com/sockjs/websocket-multiplex) uses. They even have a
+handy CDN:
 
-### app/config.yml
+```html
+<script src="http://cdn.sockjs.org/websocket-multiplex-0.1.js"></script>
+```
 
-Next, configure the default Markdown renderer for the `kwattro_markdown` service,
-so that it'll stop complaining.
+This library provides a `WebSocketMultiplex` object. You can feed it any object
+compatible with a native `WebSocket`. So, to start with you can feed it a
+native WebSocket, and later on, when you decide to install a SockJS server (or
+one is implemented in PHP) you can feed it a SockJS object. So, like this:
+
+```javascript
+var url         = 'ws://example.com:8000/multiplex';
+
+var socket;
+if (window.MozWebSocket) {
+    socket = new MozWebSocket(url);
+} else if (window.WebSocket) {
+    socket = new WebSocket(url);
+} else {
+    throw "No websocket support detected"
+}
+
+socket.binaryType = 'blob';
+
+var real_socket = new WebSocket(url);
+var multiplexer = new WebSocketMultiplex(real_socket);
+
+var foo  = multiplexer.channel('bar');
+// foo.send(), events: open, close, error, message
+
+var logs = mutliplexer.channel('log_server');
+// logs.send(), events: open, close, error, message
+
+```
+
+On the server side, you need only implement `Varspool\WebsocketBundle\Multiplex\Subscription`
+to be able to listen to events on a channel. Then just tag your service with
+`varspool_websocket.multiplex_subscription` and the topic you want to listen to:
+
+```xml
+<tag name="varspool_websocket.multiplex_subscription" topic="chat" />
+```
+
+Even better: go the whole hog and extend 
+`Varspool\WebsocketBundle\Services\MultiplexService`: no greater number of 
+methods to implement in your service sub-class, and then you can use the 
+`varspool_websocket.multiplex_service` parent tag:
 
 ```yaml
-kwattro_markdown:
-    renderer:     xhtml
+test.websocket_auth:
+    class:  Application\ExampleBundle\Services\AuthService
+    parent: varspool_websocket.multiplex_service
+    tags:
+        -
+            name:  varspool_websocket.multiplex_subscription
+            topic: auth
+        -
+            name:  varspool_websocket.multiplex_subscription
+            topic: login
 ```
 
-You can optionally configure where to find the `pygmentize` script. The default
-is `/usr/bin/pygmentize`:
-
-```yaml
-varspool_websocket:
-    bin:     /usr/local/bin/pygmentize
-```
-
-## Usage
-
-### Services
-
-#### kwattro_markdown
-
-KwattroMarkdownBundle usually provides the `kwattro_markdown` service. This 
-won't change when you set up VarspoolWebsocketBundle: the service will continue
-to provide a Markdown rendering without syntax highlighting. This service is
-usually a `Kwattro\MarkdownBundle\Markdown\KwattroMarkdown` object.
+In this example, the AuthService will listen for messages on the `auth` and
+`login` multiplex topics. It has `$this->multiplex` available to get the 
+original multiplex application. And any time a message is recieved on the server 
+this method is called:
 
 ```php
-$xhtml = $this->get('kwattro_markdown')->render($markdown_source);
+/**
+ * @param Channel $channel   The channel is an object that holds all the active
+ *          client connections to a given topic, and all the server-side 
+ *          subscribers. You can ->send($message) to the channel to broadcast
+ *          it to all the subscribed client connections. ->getTopic() identifies
+ *          the topic the message was received on.
+ *
+ * @param string $message    The received message, as a string
+ *
+ * @param Connection $client The client connection the message was received 
+ *          from. You can ->send($string) to the client, but it is a raw Websocket
+ *          connection, so if you want to send a multiplexed message to a single
+ *          client, you'll probably use 
+ *          `Varspool\WebsocketBundle\Multiplex\Protocol::toString($type, $topic, $payload)`
+ *          and the Protocol::TYPE_MESSAGE constant.
+ */
+public function onMessage(Channel $channel, $message, Connection $client = null);
 ```
-
-#### varspool_markdown
-
-Once you've installed VarspoolWebsocketBundle, you'll have a second service 
-available: `vaspool_markdown`. This service will extend
-`Kwattro\MarkdownBundle\Markdown\KwattroMarkdown`, so you should just be able
-to swap it in as a replacement quite easily. It'll colorize fenced code blocks
-in the markdown. This service is usually a 
-`Varspool\WebsocketBundle\Markdown\KwattroMarkdown` object.
-
-```php
-$colorized_xhtml = $this->get('varspool_markdown')->render($markdown_source);
-```
-
-#### varspool_websocket
-
-This service is the Sundown renderer instance responsible for coloring the 
-output. It's usually an instance of `Varspool\WebsocketBundle\Sundown\Render\ColorXHTML`.
-
-### Stylesheets
-
-The Websocket renderer marks up parts of the output with `div` tags and classes.
-You'll then need to assign stlying to these tags.
-
-#### SCSS/Compass
-
-If you're already using Compass or SASS, there's an example Websocket stylesheet
-in Resources/public/css/_websocket.scss. The default implementation uses the 
-[Solarized](http://ethanschoonover.com/solarized) color scheme. You should be
-able to @import this stylesheet from one of your own.
-
-#### Dynamic Styles
-
-Websocket can provide one of several stylesheets to automatically color the 
-output. A controller is provided that will output styles by calling
-`pygmentize -S <style>`. To use the controller, reference it from your routing:
-
-```yaml
-# app/config/routing.yml
-varspool_websocket:
-  resource: '@VarspoolWebsocketBundle/Controller/WebsocketController.php'
-  type: annotation
-``` 
-
-Then include a CSS file in your page via the URL `/websocket/<websocket_formatter>/<websocket_style>.css`.
-(e.g. /websocket/html/friendly.css).
-
-Alternatively, you can get the styles as a string from the varspool_websocket service:
-
-```php
-$websocket_formatter = $this->container->get('varspool_websocket');
-$styles = $websocket_formatter->getStyles('friendly');
-```
-
--->
