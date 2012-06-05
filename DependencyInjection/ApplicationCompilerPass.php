@@ -24,11 +24,11 @@ class ApplicationCompilerPass implements CompilerPassInterface
         if ($container->hasDefinition('varspool_websocket.multiplex')) {
             $definition = $container->getDefinition('varspool_websocket.multiplex');
 
-            foreach ($container->findTaggedServiceIds('varspool_websocket.multiplex_subscription') as $id => $attributes) {
+            foreach ($container->findTaggedServiceIds('varspool_websocket.multiplex_listener') as $id => $attributes) {
                 if (!isset($attributes[0]['topic']) || !$attributes[0]['topic']) {
-                    throw new \Exception('You must give subscription tags a topic attribute');
+                    throw new \Exception('You must give listener tags a topic attribute');
                 }
-                $definition->addMethodCall('addSubscription', array($attributes[0]['topic'], new Reference($id)));
+                $definition->addMethodCall('addListener', array($attributes[0]['topic'], new Reference($id)));
             }
         }
     }

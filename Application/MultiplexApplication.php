@@ -9,7 +9,7 @@ use WebSocket\Connection;
 use Varspool\WebsocketBundle\Application\Application;
 use Varspool\WebsocketBundle\Multiplex\Channel;
 use Varspool\WebsocketBundle\Multiplex\Protocol;
-use Varspool\WebsocketBundle\Multiplex\Subscription;
+use Varspool\WebsocketBundle\Multiplex\Listener;
 
 use \Exception;
 use \InvalidArgumentException;
@@ -26,10 +26,10 @@ use \stdClass;
  *
  * To receive messages from clients on a topic, grab a channel and subscribe to
  * it:
- *   ->getChannel($topic)->subscribe($subscription)
- *   ->getChannel($topic)->unsubscribe($subscription)
+ *   ->getChannel($topic)->subscribe($listener)
+ *   ->getChannel($topic)->unsubscribe($listener)
  *
- * Your subscription object should implement the Subscription interface.
+ * Your listener object should implement the Listener interface.
  *
  * Logging channels are used to facilitate bi-directional logging. The server
  * subscribes to TOPIC_LOG_CLIENT. Clients should send messages on this
@@ -39,7 +39,7 @@ use \stdClass;
  *
  * Server logging will often only be sent to the client that caused the error.
  */
-class MultiplexApplication extends Application implements Subscription, RemoteLogger
+class MultiplexApplication extends Application implements Listener, RemoteLogger
 {
     /**#@+
      * Logging topics
@@ -104,21 +104,21 @@ class MultiplexApplication extends Application implements Subscription, RemoteLo
     public function getChannel($topic)
     {
         if (!isset($this->channels[$topic])) {
-            $this->channels[$topic] = new Channel($topic);
+            $this->channels[$topic] = new Channel($topic, $this);
         }
         return $this->channels[$topic];
     }
 
     /**
-     * Adds the given subscription
+     * Adds the given listener
      *
      * @param string $topic
-     * @param Subscription $subscription
+     * @param Listener $listener
      */
-    public function addSubscription($topic, Subscription $subscription)
+    public function addListener($topic, Listener $listener)
     {
-        $this->log('Adding subscription to ' . $topic, 'info');
-        return $this->getChannel($topic)->subscribe($subscription);
+        $this->log('Adding listener to ' . $topic, 'info');
+        return $this->getChannel($topic)->subscribe($listener);
     }
 
     /**
@@ -132,6 +132,14 @@ class MultiplexApplication extends Application implements Subscription, RemoteLo
             $this->log('Subscribing to log channels', 'info');
             $this->getChannel(self::TOPIC_LOG_CLIENT)->subscribe($this);
             $this->getChannel(self::TOPIC_LOG_SERVER)->subscribeClient($client);
+        }
+
+        foreach ($this->channels as $channel) {
+            foreach ($channel->getListeners() as $listener) {
+                if ($listener instanceof ConnectionListener) {
+                    $listener->onConnect($client, $channel);
+                }
+            }
         }
     }
 
@@ -148,13 +156,22 @@ class MultiplexApplication extends Application implements Subscription, RemoteLo
             $this->getChannel(self::TOPIC_LOG_SERVER)->unsubscribeClient($client);
         }
 
+        foreach ($this->channels as $channel) {
+            foreach ($channel->getListeners() as $listener) {
+                if ($listener instanceof ConnectionListener) {
+                    $listener->onDisconnect($client, $channel);
+                }
+            }
+            $channel->unsubscribeClient($client);
+        }
+
         parent::onDisconnect($client);
     }
 
     /**
      * Log message receiver
      *
-     * @see Varspool\WebsocketBundle\Multiplex.Subscription::onMessage()
+     * @see Varspool\WebsocketBundle\Multiplex.Listener::onMessage()
      */
     public function onMessage(Channel $channel, $message, Connection $client = null)
     {

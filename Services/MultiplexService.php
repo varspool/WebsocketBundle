@@ -4,11 +4,12 @@ namespace Varspool\WebsocketBundle\Services;
 
 use WebSocket\Connection;
 
-use Varspool\WebsocketBundle\Multiplex\Subscription;
+use Varspool\WebsocketBundle\Multiplex\Listener;
+use Varspool\WebsocketBundle\Multiplex\ConnectionListener;
 use Varspool\WebsocketBundle\Multiplex\RemoteLogger;
 use Varspool\WebsocketBundle\Application\MultiplexApplication;
 
-abstract class MultiplexService implements Subscription, RemoteLogger
+abstract class MultiplexService implements Listener, ConnectionListener, RemoteLogger
 {
     /**
      * Multiplex websocket

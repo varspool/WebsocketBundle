@@ -5,15 +5,15 @@ namespace Varspool\WebsocketBundle\Multiplex;
 use WebSocket\Connection;
 
 /**
- * Multiplex subscription
+ * Multiplex listener
  *
  * Represents an object that can be subscribed to a multiplex channel. The
- * multiplex websocket server implementation takes subscription objects as an
+ * multiplex websocket server implementation takes listener objects as an
  * argument to subscribe() and unsubscribe().
  *
- * Note that a single subscription may have multiple topics.
+ * Note that a single listener may listen on multiple topics.
  */
-interface Subscription
+interface Listener
 {
     /**
      * @param Channel $channel   The channel is an object that holds all the active

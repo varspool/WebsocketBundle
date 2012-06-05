@@ -186,12 +186,12 @@ var logs = mutliplexer.channel('log_server');
 
 ```
 
-On the server side, you need only implement `Varspool\WebsocketBundle\Multiplex\Subscription`
+On the server side, you need only implement `Varspool\WebsocketBundle\Multiplex\Listener`
 to be able to listen to events on a channel. Then just tag your service with
-`varspool_websocket.multiplex_subscription` and the topic you want to listen to:
+`varspool_websocket.multiplex_listener` and the topic you want to listen to:
 
 ```xml
-<tag name="varspool_websocket.multiplex_subscription" topic="chat" />
+<tag name="varspool_websocket.multiplex_listener" topic="chat" />
 ```
 
 Even better: go the whole hog and extend 
@@ -205,10 +205,10 @@ test.websocket_auth:
     parent: varspool_websocket.multiplex_service
     tags:
         -
-            name:  varspool_websocket.multiplex_subscription
+            name:  varspool_websocket.multiplex_listener
             topic: auth
         -
-            name:  varspool_websocket.multiplex_subscription
+            name:  varspool_websocket.multiplex_listener
             topic: login
 ```
 

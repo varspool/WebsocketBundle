@@ -20,14 +20,21 @@ class Channel
     /**
      * Subscribers to this channel
      *
-     * @var Subscription
+     * @var array<Listener>
      */
-    protected $subscriptions = array();
+    protected $listeners = array();
+
+    /**
+     * Connection listeners
+     *
+     * @var array<ConnectionListener>
+     */
+    protected $connectionListeners = array();
 
     /**
      * Clients subscribed to this channel
      *
-     * @var Subscription
+     * @var Listener
      */
     protected $clients = array();
 
@@ -39,6 +46,7 @@ class Channel
     public function __construct($topic, MultiplexApplication $application)
     {
         $this->topic = $topic;
+        $this->application = $application;
     }
 
     /**
@@ -52,36 +60,64 @@ class Channel
     }
 
     /**
-     * Adds a subscription
+     * Adds a listener
      *
-     * @param Subscription $subscription
+     * @param Listener $listener
      */
-    public function subscribe(Subscription $subscription)
+    public function subscribe(Listener $listener)
     {
-        $this->subscriptions[] = $subscription;
+        $this->listeners[] = $listener;
+        if ($listener instanceof ConnectionListener) {
+            $this->connectionListeners[] = $listener;
+        }
     }
 
     /**
-     * Unsubscribe the given subscription
+     * Unsubscribe the given listener
      *
-     * @param Subscription $subscription
+     * @param Listener $listener
      */
-    public function unsubscribe(Subscription $subscription)
+    public function unsubscribe(Listener $listener)
     {
-        $index = array_search($subscription, $this->subscriptions);
+        $index = array_search($listener, $this->listeners, true);
         if ($index) {
-            unset($this->subscriptions[$index]);
+            unset($this->listeners[$index]);
         }
+
+        $index = array_search($listener, $this->connectionListeners, true);
+        if ($index) {
+            unset($this->connectionListeners[$index]);
+        }
+    }
+
+    /**
+     * Gets the listeners
+     *
+     * @return array<\Varspool\WebsocketBundle\Multiplex\Listener>
+     */
+    public function getListeners()
+    {
+        return $this->listeners;
+    }
+
+    /**
+     * Gets the connection listeners
+     *
+     * @return array<\Varspool\WebsocketBundle\Multiplex\ConnectionListener>
+     */
+    public function getConnectionListeners()
+    {
+        return $this->connectionListeners;
     }
 
     /**
      * Adds a client to the channel
      *
-     * @param Subscription $client
+     * @param Listener $client
      */
     public function subscribeClient(Connection $client)
     {
-        $this->clients[] = $client;
+        $this->clients[$client->getClientId()] = $client;
     }
 
     /**
@@ -91,16 +127,18 @@ class Channel
      */
     public function unsubscribeClient(Connection $client)
     {
-        $index = array_search($client, $this->clients);
-        if ($index) {
-            unset($this->clients[$index]);
-        }
+        unset($this->clients[$client->getClientId()]);
     }
 
     public function isClientSubscribed(Connection $client)
     {
+        return array_key_exists($client->getClientId(), $this->clients);
+    }
 
-    }WW
+    public function getClient($id)
+    {
+        return $this->clients[$id];
+    }
 
     /**
      * Sends a message through the channel
@@ -114,16 +152,22 @@ class Channel
         $masked = false,
         array $options = array()
     ) {
-        $except = isset($options['except']) && $options['except'] instanceof Connection
+        $except = isset($options['except'])
                         ? $options['except']
                         : false;
 
         $clients = $this->clients;
 
-        if ($except) {
-            $clients = array_filter($clients, function ($client) use ($except) {
-                return $client !== $except;
-            });
+        if ($except instanceof Connection) {
+            $except = array($except);
+        }
+
+        if (is_array($except)) {
+            foreach ($except as $connection) {
+                if ($connection instanceof Connection) {
+                    unset($clients[$connection->getClientId()]);
+                }
+            }
         }
 
         $collected = array();
@@ -153,8 +197,8 @@ class Channel
         }
 
         $collected = array();
-        foreach ($this->subscriptions as $subscription) {
-            $collected[] = $subscription->onMessage($this, $message, $client);
+        foreach ($this->listeners as $listener) {
+            $collected[] = $listener->onMessage($this, $message, $client);
         }
         return $collected;
     }
