@@ -8,13 +8,12 @@ multiplexing, semantic configuration.
 
 VarspoolWebsocketBundle depends on:
 
-* [dominics/WebSocket](https://github.com/dominics/WebSocket)
-  * This is a simple pure-PHP WebSocket library. Originally forked from
-    nicokaiser/php-websocket, which seems abandoned. There are open pulls, no
-    commits in ages, etc. So, treat this as upstream.
+* Wrench (formerly for php-websocket), version 2.0.0-beta ([varspool/Wrench](https://github.com/dominics/Wrench))
+  * A simple WebSockets library for PHP 5.3, providing PHP support for WebSocket
+     clients and servers, using streams.
 
 And, of course, Symfony2. Mostly, the bundle is a light compatibility layer
-over php-websocket that allows it to be used with the Service Container.
+over WebSocket 2.0 that allows it to be used with the Service Container.
 
 ### deps file
 
@@ -23,7 +22,7 @@ lines to your `deps` file:
 
 ```ini
 [websocket]
-    git=git://github.com/dominics/WebSocket.git
+    git=git://github.com/dominics/Wrench.git
     version=origin/master
 
 [VarspoolWebsocketBundle]
@@ -53,7 +52,7 @@ Register the Varspool and Websocket namespaces in your autoloader:
 $loader->registerNamespaces(array(
     // [...]
     'Varspool'   => __DIR__.'/../vendor/bundles',
-    'WebSocket'  => __DIR__.'/../vendor/websocket/server/lib' // NB: Capital S
+    'WebSocket'  => __DIR__.'/../vendor/websocket/lib' // NB: Capital S
 ));
 ```
 
@@ -102,8 +101,7 @@ suggest "default"). Here's what a definition might look like:
 varspool_websocket:
     servers:
         default: # Server name
-            host: 192.168.1.103 # default: localhost
-            port: 8888          # default: 8000
+            listen: ws://192.168.1.103:8000 # default: ws://localhost:8000
 
             # Applications this server will allow
             applications:
@@ -136,12 +134,12 @@ Registering your application is easy. The server looks for services tagged as
 with that tag.
 
 A single server daemon can serve one or more applications. So, you'll also have
-to include a `key` attribute with your tag. This ends up in your application URL. 
+to include a `key` attribute with your tag. This ends up in your application URL.
 For example, if you use this service definition:
 
 ```xml
 <!-- Application\ChatBundle\Resources\config\services.xml -->
-<service id="chat_service" class="Applicatoin\ChatBundle\Services\ChatService">
+<service id="chat_service" class="Application\ChatBundle\Services\ChatService">
     <tag name="varspool_websocket.application" key="chat" />
 </service>
 ```
@@ -272,7 +270,7 @@ the message, or to all clients subscribed to a channel.
 
 * Clients cannot send messages to other clients, unless you specifically relay
   them.
-  * Channels provide a handy abstraction to do so: `$channel->send('foo', 'text', false, array('except' => $client)`
+  * Channels provide a handy abstraction to do so: `$channel->send('foo', 'text', false, array('except' => $client))`
 * Listeners cannot send messages to other listeners.
   * But you can use whatever you like for that: listeners can be DI'd into the service
     container.
