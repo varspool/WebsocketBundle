@@ -140,21 +140,21 @@ you use this tag:
 <!-- <service> -->
     <tag id="varspool_websocket.application" key="foobar" />
 <!-- </service> -->
+```
 
 And your server is configured to listen on 192.168.1.10:8000 then the URL of
 your application will be:
 
     ws://192.168.1.10:8000/foobar
 
-
 Here's a full service definition, in YAML:
 
 ```yaml
 services:
-  websocket_example:
-    class: Application\ExampleBundle\Application\ExampleApplication
-    tags:
-      - { name: varspool_websocket.application, key: foobar }
+    websocket_example:
+        class: Application\ExampleBundle\Application\ExampleApplication
+        tags:
+            - { name: varspool_websocket.application, key: foobar }
 ```
 
 For a simple example of an application, see `Application\EchoApplication`.
