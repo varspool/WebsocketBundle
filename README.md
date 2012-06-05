@@ -105,7 +105,7 @@ varspool_websocket:
             host: 192.168.1.103 # default: localhost
             port: 8888          # default: 8000
 
-            # Applications this server will allow: see Applications
+            # Applications this server will allow
             applications:
                 - echo
                 - multiplex
@@ -122,32 +122,50 @@ varspool_websocket:
             max_requests_per_minute: 50
 ```
 
-### Applications
-
 Once you've configured a server, run the websocket:listen command. When it
 runs, the server will start up and serve applications you've
-defined in your configuration.  Specifically, it looks for services tagged as
+defined in your configuration.
+
+### Applications
+
+The server on its own doesn't do anything until you write an **application**
+for it. The server calls methods on your applications once they are registered.
+
+Registering your application is easy. The server looks for services tagged as
 `varspool_websocket.application`.  So, to run an application, export a service
 with that tag.
 
-A single server daemon can serve one or more applications. You have to specify
-the applications allowed for each server you define. (As we did for the "echo"
-and "multiplex" applications above). So, you'll need to include a `key`
-attribute with your tag. This ends up in your application URL. For example, if
-you use this tag:
+A single server daemon can serve one or more applications. So, you'll also have
+to include a `key` attribute with your tag. This ends up in your application URL. 
+For example, if you use this service definition:
 
 ```xml
-<!-- <service> -->
-    <tag id="varspool_websocket.application" key="foobar" />
-<!-- </service> -->
+<!-- Application\ChatBundle\Resources\config\services.xml -->
+<service id="chat_service" class="Applicatoin\ChatBundle\Services\ChatService">
+    <tag name="varspool_websocket.application" key="chat" />
+</service>
 ```
 
-And your server is configured to listen on 192.168.1.10:8000 then the URL of
+And your server is configured to listen on 192.168.1.10:8000, then the URL of
 your application will be:
 
-    ws://192.168.1.10:8000/foobar
+    ws://192.168.1.10:8000/chat
 
-Here's a full service definition, in YAML:
+Applications are not registered on servers unless they are specified in the
+server configuration. So, to enable the above application on the default
+server, you configuration would need to contain:
+
+```
+# app/config.yml
+varspool_websocket:
+    servers:
+        default:
+            # ...
+            applications:
+                - chat
+```
+
+Here's another example service definition, this time in YAML:
 
 ```yaml
 services:
@@ -167,7 +185,7 @@ like: just implement a compatible interface. (This is the same approach taken
 by php-websocket so far: an abstract `WebSocket\Application` class is provided,
 but the Server does no typechecking.)
 
-And here's what that the listen looks like when you run it with a few services
+Finally, here's what that the listen command looks like when you run it with a few services
 defined:
 
 ```
