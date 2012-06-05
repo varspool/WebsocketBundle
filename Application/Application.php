@@ -10,7 +10,7 @@ use \Closure;
  * Overriden because the base class is a singleton and we want to inject our
  * applications using the service container.
  */
-abstract class Application extends BaseApplication implements NamedApplication
+abstract class Application extends BaseApplication
 {
     /**
      * Active clients
@@ -25,11 +25,6 @@ abstract class Application extends BaseApplication implements NamedApplication
      * @var Closure
      */
     protected $logger;
-
-    /**
-     * @see Varspool\WebsocketBundle\Application.NamedApplication::getName()
-     */
-    abstract public function getName();
 
     /**
      * Screw singletons, we use DI

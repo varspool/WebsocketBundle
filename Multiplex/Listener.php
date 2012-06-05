@@ -31,5 +31,5 @@ interface Listener
      *          `Varspool\WebsocketBundle\Multiplex\Protocol::toString($type, $topic, $payload)`
      *          and the Protocol::TYPE_MESSAGE constant.
      */
-    public function onMessage(Channel $channel, $message, Connection $client = null);
+    public function onMessage(Channel $channel, $message, Connection $client);
 }

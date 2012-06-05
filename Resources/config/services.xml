@@ -6,49 +6,46 @@
     
     <parameters>
         <parameter key="varspool_websocket.server_manager.class">Varspool\WebsocketBundle\Services\ServerManager</parameter>
-        <parameter key="varspool_websocket.application_manager.class">Varspool\WebsocketBundle\Services\ApplicationManager</parameter>
+        <parameter key="varspool_websocket.multiplex.class">Varspool\WebsocketBundle\Application\MultiplexApplication</parameter>
     </parameters>
     
     <services>
         <service id="varspool_websocket.server_manager"
                  class="%varspool_websocket.server_manager.class%">
-            <!-- To use monolog -->
+            <!-- To use monolog: -->
+            <!-- 
             <call method="setLogger">
                 <argument id="monolog.logger" type="service" />
             </call>
-        </service>
-    
-        <service id="varspool_websocket.application_manager"
-                 class="%varspool_websocket.application_manager.class%">
-        </service>
-        
-        <!-- Multiplex service -->
-        <service id="varspool_websocket.multiplex"
-                 class="Varspool\WebsocketBundle\Application\MultiplexApplication">
-            <!-- Debug mode: -->
-            <argument type="constant">true</argument>     
-                 
-            <tag name="varspool_websocket.application" />
-        </service>
-        
-        <!-- Parent service for a multiplex subscriber -->
-        <service id="varspool_websocket.multiplex_service" abstract="true"
-                 class="Varspool\WebsocketBundle\Services\MultiplexService">
-             <argument type="service" id="varspool_websocket.multiplex" />
-             <!-- Children should add a tag for each channel they want to subscribe to: -->
-             <!--  
-                <tag name="varspool_websocket.application" topic="some_topic" />
              -->
         </service>
         
-        
-        <!-- Example service: echo -->
-        <!-- -->
+        <!-- Example application: /echo -->
         <service id="varspool_websocket.examples.echo_application"
                  class="Varspool\WebsocketBundle\Application\EchoApplication">
             <!-- Use the varspool_websocket.application tag to mark your application -->
-            <tag name="varspool_websocket.application" />
+            <tag name="varspool_websocket.application" key="echo" />
         </service>
-        <!-- -->
+
+        <!-- Multiplex application: /multiplex -->
+        <!-- To use: see README.md, or just extend varspool_websocket.multiplex_service -->
+        <service id="varspool_websocket.multiplex"
+                 class="%varspool_websocket.multiplex.class%">
+            <!-- Debug mode: -->
+            <argument type="constant">true</argument>
+                 
+            <tag name="varspool_websocket.application" key="multiplex" />
+        </service>
+        
+        <!-- Parent service for a multiplex subscriber -->
+        <!-- Extend me! -->
+        <service id="varspool_websocket.multiplex_service" abstract="true"
+                 class="Varspool\WebsocketBundle\Services\MultiplexService">
+             <argument type="service" id="varspool_websocket.multiplex" />
+             <!-- Child services should add a tag for each channel they want to subscribe to: -->
+             <!--  
+                <tag name="varspool_websocket.multiplex_subscriber" topic="some_topic" />
+             -->
+        </service>
     </services>
 </container>

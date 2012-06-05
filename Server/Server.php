@@ -32,14 +32,14 @@ class Server extends BaseServer
         $ssl = false,
         Closure $logger
     ) {
-        $this->logger = $logger;
+        $this->setLogger($logger);
 
         $this->log(sprintf(
             'Listening on %s:%d with ssl %s',
             $host,
             $port,
             $ssl ? 'on' : 'off'
-        ));
+        ), 'info');
 
         parent::__construct($host, $port, $ssl);
     }
@@ -52,6 +52,11 @@ class Server extends BaseServer
     public function setLogger(Closure $logger)
     {
         $this->logger = $logger;
+        foreach ($this->applications as $application) {
+            if ($application instanceof Application) {
+                $this->application->setLogger($this->logger);
+            }
+        }
     }
 
     /**

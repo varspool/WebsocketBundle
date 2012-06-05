@@ -49,12 +49,6 @@ class ListenCommand extends ContainerAwareCommand
         });
 
         $server = $manager->getServer($name);
-
-        $app_manager = $this->getContainer()->get('varspool_websocket.application_manager');
-        foreach ($app_manager as $name => $application) {
-            $server->registerApplication($name, $application);
-        }
-
     	$server->run();
     }
 }

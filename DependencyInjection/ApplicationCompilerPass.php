@@ -13,11 +13,14 @@ class ApplicationCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if ($container->hasDefinition('varspool_websocket.application_manager')) {
-            $definition = $container->getDefinition('varspool_websocket.application_manager');
+        if ($container->hasDefinition('varspool_websocket.server_manager')) {
+            $definition = $container->getDefinition('varspool_websocket.server_manager');
 
             foreach ($container->findTaggedServiceIds('varspool_websocket.application') as $id => $attributes) {
-                $definition->addMethodCall('addNamedApplication', array(new Reference($id)));
+                if (!isset($attributes[0]['key']) || !$attributes[0]['key']) {
+                    throw new \Exception('You must give varspool_websocket.application tags a key attribute');
+                }
+                $definition->addMethodCall('addApplication', array($attributes[0]['key'], new Reference($id)));
             }
         }
 
@@ -26,7 +29,7 @@ class ApplicationCompilerPass implements CompilerPassInterface
 
             foreach ($container->findTaggedServiceIds('varspool_websocket.multiplex_listener') as $id => $attributes) {
                 if (!isset($attributes[0]['topic']) || !$attributes[0]['topic']) {
-                    throw new \Exception('You must give listener tags a topic attribute');
+                    throw new \Exception('You must give varspool_websocket.listener tags a topic attribute');
                 }
                 $definition->addMethodCall('addListener', array($attributes[0]['topic'], new Reference($id)));
             }

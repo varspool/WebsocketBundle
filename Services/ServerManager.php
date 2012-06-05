@@ -9,7 +9,8 @@ use \InvalidArgumentException;
  *
  * Mainly exists to defer choosing a logger until just before the server is
  * instantiated. This allows the logger to be replaced by an OutputInterface, yet
- * still support Monolog.
+ * still support Monolog. In fact, because the logger is swapped out with a
+ * Closure here, you can pass in your own logging callback.
  */
 class ServerManager
 {
@@ -24,6 +25,11 @@ class ServerManager
     protected $servers = array();
 
     /**
+     * @var array<Application>
+     */
+    protected $applications = array();
+
+    /**
      * @var array<string => array>
      */
     protected $configuration;
@@ -36,6 +42,11 @@ class ServerManager
         $this->logger = function ($message, $level = 'info') {
             echo $level . ': ' . $message . "\n";
         };
+    }
+
+    public function addApplication($key, $application)
+    {
+        $this->applications[$key] = $application;
     }
 
     /**
@@ -93,6 +104,13 @@ class ServerManager
 
         foreach ($config['allow_origin'] as $origin) {
             $server->setAllowedOrigin($origin);
+        }
+
+        foreach ($config['applications'] as $key) {
+            if (!isset($this->applications[$key])) {
+                throw new \RuntimeException('Invalid server config: application ' . $key . ' not found');
+            }
+            $server->registerApplication($key, $this->applications[$key]);
         }
 
         return (($this->servers[$name] = $server));
