@@ -127,16 +127,19 @@ varspool_websocket:
 Once you've configured a server, run the websocket:listen command. When it
 runs, the server will start up and serve applications you've
 defined in your configuration.  Specifically, it looks for services tagged as
-`varspool\_websocket.application`.  So, to run an application, export a service
+`varspool_websocket.application`.  So, to run an application, export a service
 with that tag.
 
 A single server daemon can serve one or more applications. You have to specify
 the applications allowed for each server you define. (As we did for the "echo"
-and "multiplex" applications above). So, you'll need to include a "key"
+and "multiplex" applications above). So, you'll need to include a `key`
 attribute with your tag. This ends up in your application URL. For example, if
 you use this tag:
 
+```xml
+<!-- <service> -->
     <tag id="varspool_websocket.application" key="foobar" />
+<!-- </service> -->
 
 And your server is configured to listen on 192.168.1.10:8000 then the URL of
 your application will be:
@@ -281,7 +284,7 @@ listen to events on a channel:
 public function onMessage(Channel $channel, $message, Connection $client);
 ```
 Then just tag your service with
-`varspool\_websocket.multiplex\_listener` and the topic you want to listen to:
+`varspool_websocket.multiplex_listener` and the topic you want to listen to:
 
 ```xml
 <service id="example.custom" class="Application\ExampleBundle\Services\CustomService">
@@ -326,7 +329,7 @@ class GameServer implements Listener, ConnectionListener
 For convenience, if you want to implement both of these interfaces, and some
 other useful functionality (like getting access to the server or mulitplex
 application instances), just extend `Services\MultiplexService`, and export it
-in your config with `varspool\_websocket.multiplex\_service` as its parent.
+in your config with `varspool_websocket.multiplex_service` as its parent.
 
 Here's what that looks like in YAML (with bonus: mulitple channel listener):
 
