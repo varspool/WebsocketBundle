@@ -8,8 +8,8 @@ multiplexing, semantic configuration.
 
 VarspoolWebsocketBundle depends on:
 
-* [lemmingzshadow/php-websocket](https://github.com/lemmingzshadow/php-websocket)
-  * This is a great little pure-PHP library. Originally forked from
+* [dominics/WebSocket](https://github.com/domninic/WebSocket)
+  * This is a simple pure-PHP WebSocket library. Originally forked from
     nicokaiser/php-websocket, which seems abandoned. There are open pulls, no
     commits in ages, etc. So, treat lemmingzshadow/php-websocket as upstream.
 
@@ -27,7 +27,7 @@ lines to your `deps` file:
     version=origin/master
 
 [VarspoolWebsocketBundle]
-    git=git://github.com/dominics/VarspoolWebsocketBundle.git
+    git=git://github.com/varspool/WebsocketBundle.git
     target=/bundles/Varspool/WebsocketBundle
     version=origin/master
 ```
