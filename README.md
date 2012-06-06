@@ -8,10 +8,10 @@ multiplexing, semantic configuration.
 
 VarspoolWebsocketBundle depends on:
 
-* [dominics/WebSocket](https://github.com/domninic/WebSocket)
+* [dominics/WebSocket](https://github.com/dominics/WebSocket)
   * This is a simple pure-PHP WebSocket library. Originally forked from
     nicokaiser/php-websocket, which seems abandoned. There are open pulls, no
-    commits in ages, etc. So, treat lemmingzshadow/php-websocket as upstream.
+    commits in ages, etc. So, treat this as upstream.
 
 And, of course, Symfony2. Mostly, the bundle is a light compatibility layer
 over php-websocket that allows it to be used with the Service Container.
@@ -23,7 +23,7 @@ lines to your `deps` file:
 
 ```ini
 [websocket]
-    git=git://github.com/lemmingzshadow/php-websocket.git
+    git=git://github.com/dominics/WebSocket.git
     version=origin/master
 
 [VarspoolWebsocketBundle]
