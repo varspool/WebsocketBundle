@@ -91,20 +91,20 @@ class ServerManager
         $config = $this->configuration[$name];
 
         $server = new $config['class'](
-            $config['host'],
-            $config['port'],
-            $config['ssl'],
-            $this->logger
+            $config['listen'],
+            array(
+                'logger' => $this->logger,
+            )
         );
 
-        $server->setMaxClients($config['max_clients']);
-        $server->setMaxConnectionsPerIp($config['max_connections_per_ip']);
-        $server->setMaxRequestsPerMinute($config['max_requests_per_minute']);
-        $server->setCheckOrigin($config['check_origin']);
+//         $server->setMaxClients($config['max_clients']);
+//         $server->setMaxConnectionsPerIp($config['max_connections_per_ip']);
+//         $server->setMaxRequestsPerMinute($config['max_requests_per_minute']);
+//         $server->setCheckOrigin($config['check_origin']);
 
-        foreach ($config['allow_origin'] as $origin) {
-            $server->setAllowedOrigin($origin);
-        }
+//         foreach ($config['allow_origin'] as $origin) {
+//             $server->setAllowedOrigin($origin);
+//         }
 
         foreach ($config['applications'] as $key) {
             if (!isset($this->applications[$key])) {

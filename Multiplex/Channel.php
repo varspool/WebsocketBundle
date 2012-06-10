@@ -117,7 +117,7 @@ class Channel
      */
     public function subscribeClient(Connection $client)
     {
-        $this->clients[$client->getClientId()] = $client;
+        $this->clients[$client->getId()] = $client;
     }
 
     /**
@@ -127,12 +127,12 @@ class Channel
      */
     public function unsubscribeClient(Connection $client)
     {
-        unset($this->clients[$client->getClientId()]);
+        unset($this->clients[$client->getId()]);
     }
 
     public function isClientSubscribed(Connection $client)
     {
-        return array_key_exists($client->getClientId(), $this->clients);
+        return array_key_exists($client->getId(), $this->clients);
     }
 
     public function getClient($id)
@@ -165,7 +165,7 @@ class Channel
         if (is_array($except)) {
             foreach ($except as $connection) {
                 if ($connection instanceof Connection) {
-                    unset($clients[$connection->getClientId()]);
+                    unset($clients[$connection->getId()]);
                 }
             }
         }

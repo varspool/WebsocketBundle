@@ -12,54 +12,6 @@ use \Closure;
 class Server extends BaseServer
 {
     /**
-     * Logger instance
-     *
-     * @var Logging closure
-     */
-    public $logger;
-
-    /**
-     * Constructor
-     *
-     * @param string $host
-     * @param int $port
-     * @param boolean $ssl
-     * @param \Closure|Monolog\Logger
-     */
-    public function __construct(
-        $host = 'localhost',
-        $port = 8000,
-        $ssl = false,
-        Closure $logger
-    ) {
-        $this->setLogger($logger);
-
-        $this->log(sprintf(
-            'Listening on %s:%d with ssl %s',
-            $host,
-            $port,
-            $ssl ? 'on' : 'off'
-        ), 'info');
-
-        parent::__construct($host, $port, $ssl);
-    }
-
-    /**
-     * Sets the logger to use
-     *
-     * @param Closure $logger
-     */
-    public function setLogger(Closure $logger)
-    {
-        $this->logger = $logger;
-        foreach ($this->applications as $application) {
-            if ($application instanceof Application) {
-                $this->application->setLogger($this->logger);
-            }
-        }
-    }
-
-    /**
      * @see WebSocket.Server::registerApplication()
      */
     public function registerApplication($key, $application)
