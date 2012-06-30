@@ -1,5 +1,5 @@
 {
-    "name": "varspool/WebsocketBundle",
+    "name": "varspool/websocket-bundle",
     "type": "library",
     "description": "PHP WebSocket client/server library",
     "keywords": ["websocket", "websockets", "hybi"],
