@@ -1,0 +1,26 @@
+{
+    "name": "varspool/WebsocketBundle",
+    "type": "library",
+    "description": "PHP WebSocket client/server library",
+    "keywords": ["websocket", "websockets", "hybi"],
+    "homepage": "http://github.com/varspool/WebsocketBundle",
+    "license": "WTFPL",
+    "authors": [
+        {
+            "name":     "Dominic Scheirlinck",
+            "email":    "dominic@varspool.com",
+            "homepage": "http://www.somethingemporium.com/"
+        }
+    ],
+    "require": {
+        "symfony/framework-bundle": "2.*",
+        "kwattro/markdown-bundle": "*",
+        "php": ">=5.3"
+    },
+    "autoload": {
+        "psr-0": {
+            "Varspool\\WebsocketBundle": ""
+        }
+    },
+    "target-dir": "Varspool/WebsocketBundle"
+}
