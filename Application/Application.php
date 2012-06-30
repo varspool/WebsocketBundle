@@ -2,7 +2,7 @@
 
 namespace Varspool\WebsocketBundle\Application;
 
-use WebSocket\Application\Application as BaseApplication;
+use Wrench\Application\Application as BaseApplication;
 
 use \Closure;
 

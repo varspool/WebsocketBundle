@@ -6,7 +6,7 @@ use Varspool\WebsocketBundle\VarspoolWebsocketBundle;
 
 use \InvalidArgumentException;
 
-use WebSocket\Server;
+use Wrench\Server;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;

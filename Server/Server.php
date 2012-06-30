@@ -3,7 +3,7 @@
 namespace Varspool\WebsocketBundle\Server;
 
 use Varspool\WebsocketBundle\Application\Application;
-use WebSocket\Server as BaseServer;
+use Wrench\Server as BaseServer;
 use \Closure;
 
 /**

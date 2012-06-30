@@ -2,7 +2,7 @@
 
 namespace Varspool\WebsocketBundle\Multiplex;
 
-use WebSocket\Connection;
+use Wrench\Connection;
 
 interface RemoteLogger
 {

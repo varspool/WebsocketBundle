@@ -4,7 +4,7 @@ namespace Varspool\WebsocketBundle\Application;
 
 use Varspool\WebsocketBundle\Multiplex\RemoteLogger;
 
-use WebSocket\Connection;
+use Wrench\Connection;
 
 use Varspool\WebsocketBundle\Application\Application;
 use Varspool\WebsocketBundle\Multiplex\Channel;

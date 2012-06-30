@@ -4,7 +4,7 @@ namespace Varspool\WebsocketBundle\Multiplex;
 
 use Varspool\WebsocketBundle\Application\MultiplexApplication;
 
-use WebSocket\Connection;
+use Wrench\Connection;
 
 use Varspool\WebsocketBundle\Multiplex\Protocol;
 

@@ -2,7 +2,7 @@
 
 namespace Varspool\WebsocketBundle\Services;
 
-use WebSocket\Connection;
+use Wrench\Connection;
 
 use Varspool\WebsocketBundle\Multiplex\Listener;
 use Varspool\WebsocketBundle\Multiplex\ConnectionListener;
