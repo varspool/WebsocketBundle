@@ -8,21 +8,37 @@ multiplexing, semantic configuration.
 
 VarspoolWebsocketBundle depends on:
 
-* Wrench (formerly for php-websocket), version 2.0.0-beta ([varspool/Wrench](https://github.com/dominics/Wrench))
+* Wrench (formerly for php-websocket), version 2.0.0-beta ([varspool/Wrench](https://github.com/varspool/Wrench))
   * A simple WebSockets library for PHP 5.3, providing PHP support for WebSocket
      clients and servers, using streams.
 
 And, of course, Symfony2. Mostly, the bundle is a light compatibility layer
 over WebSocket 2.0 that allows it to be used with the Service Container.
 
-### deps file
+### Configuring dependencies
+
+#### Composer
+
+If you're using Composer, add the following packages to your project's
+requires:
+
+```json
+{
+    "require": {
+        "varspool/websocket-bundle": "dev-master",
+        "wrench/wrench": "dev-master"
+    }
+}
+```
+
+#### deps file
 
 If you're using bin/vendors to configure your dependencies, add the following
 lines to your `deps` file:
 
 ```ini
-[websocket]
-    git=git://github.com/dominics/Wrench.git
+[wrench]
+    git=git://github.com/varspool/Wrench.git
     version=origin/master
 
 [VarspoolWebsocketBundle]
@@ -39,20 +55,21 @@ obtain the bundles:
 $ bin/vendors update
 
 [...]
-  > Installing/Updating websocket
+  > Installing/Updating wrench
   > Installing/Updating VarspoolWebsocketBundle
 ```
 
-### app/autoload.php
+##### app/autoload.php
 
-Register the Varspool and Websocket namespaces in your autoloader:
+Register the Varspool and Wrench namespaces in your autoloader (not
+necessary if you're using Composer with Symfony 2.1):
 
 ```php
 # app/autoload.php
 $loader->registerNamespaces(array(
     // [...]
-    'Varspool'   => __DIR__.'/../vendor/bundles',
-    'WebSocket'  => __DIR__.'/../vendor/websocket/lib' // NB: Capital S
+    'Varspool' => __DIR__.'/../vendor/bundles',
+    'Wrench'   => __DIR__.'/../vendor/wrench/lib'
 ));
 ```
 
