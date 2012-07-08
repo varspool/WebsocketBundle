@@ -93,7 +93,8 @@ class ServerManager
         $server = new $config['class'](
             $config['listen'],
             array(
-                'logger' => $this->logger,
+                'logger'          => $this->logger,
+                'allowed_origins' => $config['allow_origin']
             )
         );
 

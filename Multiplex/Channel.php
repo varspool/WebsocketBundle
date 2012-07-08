@@ -3,9 +3,8 @@
 namespace Varspool\WebsocketBundle\Multiplex;
 
 use Varspool\WebsocketBundle\Application\MultiplexApplication;
-
 use Wrench\Connection;
-
+use Wrench\Protocol\Protocol as WrenchProtocol;
 use Varspool\WebsocketBundle\Multiplex\Protocol;
 
 class Channel
@@ -148,8 +147,8 @@ class Channel
      */
     public function send(
         $message,
-        $type = 'text',
-        $masked = false,
+        $type = WrenchProtocol::TYPE_TEXT,
+        $masked = true,
         array $options = array()
     ) {
         $except = isset($options['except'])

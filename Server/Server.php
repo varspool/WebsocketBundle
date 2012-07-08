@@ -3,7 +3,7 @@
 namespace Varspool\WebsocketBundle\Server;
 
 use Varspool\WebsocketBundle\Application\Application;
-use Wrench\Server as BaseServer;
+use Wrench\BasicServer as BaseServer;
 use \Closure;
 
 /**
@@ -12,7 +12,7 @@ use \Closure;
 class Server extends BaseServer
 {
     /**
-     * @see WebSocket.Server::registerApplication()
+     * @see Wrench.Server::registerApplication()
      */
     public function registerApplication($key, $application)
     {
@@ -35,7 +35,7 @@ class Server extends BaseServer
     }
 
     /**
-     * @see WebSocket.Server::log()
+     * @see Wrench.Server::log()
      */
     public function log($message, $level = 'info')
     {

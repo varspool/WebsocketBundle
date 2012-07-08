@@ -122,7 +122,7 @@ class MultiplexApplication extends Application implements Listener, RemoteLogger
     }
 
     /**
-     * @see WebSocket\Application.Application::onConnect()
+     * @see Wrench\Application.Application::onConnect()
      */
     public function onConnect($client)
     {
@@ -144,7 +144,7 @@ class MultiplexApplication extends Application implements Listener, RemoteLogger
     }
 
     /**
-     * @see WebSocket\Application.Application::onDisconnect()
+     * @see Wrench\Application.Application::onDisconnect()
      */
     public function onDisconnect($client)
     {
@@ -152,7 +152,6 @@ class MultiplexApplication extends Application implements Listener, RemoteLogger
             // Disallow remote logging: shutting down
             $this->remoteLogging = false;
             $this->log('Unsubscribing from log channels', 'info');
-            $this->getChannel(self::TOPIC_LOG_CLIENT)->unsubscribe($this);
             $this->getChannel(self::TOPIC_LOG_SERVER)->unsubscribeClient($client);
         }
 
@@ -181,12 +180,12 @@ class MultiplexApplication extends Application implements Listener, RemoteLogger
     }
 
     /**
-     * @see WebSocket\Application.Application::onData()
+     * @see Wrench\Application.Application::onData()
      */
     public function onData($data, $client)
     {
         try {
-            $command = Protocol::fromString($data);
+            $command = Protocol::fromString((string)$data);
         } catch (Exception $e) {
             $this->log($e, 'err', $client);
             return;

@@ -42,7 +42,6 @@ class Configuration implements ConfigurationInterface
                             ->arrayNode('applications')
                                 ->requiresAtLeastOneElement()
                                 ->isRequired()
-                                ->addDefaultsIfNotSet()
                                 ->defaultValue(array('echo'))
                                 ->prototype('scalar')->end()
                             ->end()
