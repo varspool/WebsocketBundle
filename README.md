@@ -1,8 +1,17 @@
 <!-- vim: set ft=markdown tw=79 sw=4 ts=4 et : -->
 # VarspoolWebsocketBundle
 
-Alpha stability. Provides websocket services, including an in-built server,
+Deprecated. Provides websocket services, including an in-built server,
 multiplexing, semantic configuration.
+
+## WebSockets in Symfony2
+
+This bundle provided integration of Wrench, a websocket library, into Symfony2.
+I'm pleased to say that if you use a slightly different library, this bundle
+really isn't needed. Ratchet is composable enough that you can get by without
+throwing it all into Symfony's configuration system.
+
+I suggest, for new projects, you [just go straight to Ratchet](http://somethingemporium.com/2012/10/websockets-with-symfony2), and ignore this project.
 
 ## Installation
 
