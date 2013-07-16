@@ -4,13 +4,16 @@
 Alpha stability. Provides websocket services, including an in-built server,
 multiplexing, semantic configuration.
 
+There may be [better ways](http://somethingemporium.com/2012/10/websockets-with-symfony2)
+to do Websockets in Symfony2, some of which will result in you not even needing a third-party
+bundle. The amount of code needed to use [Ratchet](http://socketo.me/), for instance, is so small you
+may decide to forgo custom configuration and using the Container to configure your server.
+
 ## Installation
 
 VarspoolWebsocketBundle depends on:
 
-* Wrench (formerly for php-websocket), version 2.0.0-beta ([varspool/Wrench](https://github.com/varspool/Wrench))
-  * A simple WebSockets library for PHP 5.3, providing PHP support for WebSocket
-     clients and servers, using streams.
+* Wrench (formerly for php-websocket), version 2.0.1+ ([varspool/Wrench](https://github.com/varspool/Wrench))
 
 And, of course, Symfony2. Mostly, the bundle is a light compatibility layer
 over WebSocket 2.0 that allows it to be used with the Service Container.
