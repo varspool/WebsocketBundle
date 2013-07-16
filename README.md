@@ -335,7 +335,7 @@ implement the additional `Multiplex\ConnectionListener` interface as well:
 use Varspool\WebsocketBundle\Multiplex\Listener;
 use Varspool\WebsocketBundle\Multiplex\ConnectionListener;
 use Varspool\WebsocketBundle\Multiplex\Channel;
-use WebSocket\Connection;
+use Wrench\Connection;
 
 class GameServer implements Listener, ConnectionListener
 {
